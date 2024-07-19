@@ -18,7 +18,7 @@ from gemini_utility import upload_audio_file, generate_transcription
 from gemini_utility import load_gemini_pro_model, generate_video_transcription
 import tempfile
 from gemini_utility import input_image_setup
-
+from playsound import playsound
 # Import additional libraries for voice assistance
 import speech_recognition as sr
 from gtts import gTTS
