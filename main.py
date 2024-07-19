@@ -22,7 +22,7 @@ from gemini_utility import input_image_setup
 # Import additional libraries for voice assistance
 import speech_recognition as sr
 from gtts import gTTS
-from playsound import playsound
+import pyaudio
 
 # Load environment variables from .env file
 load_dotenv()
@@ -38,8 +38,8 @@ st.set_page_config(
 with st.sidebar:
     selected = option_menu(
         menu_title="Gemini AI",
-        options=["ChatBot", "Image Captioning",  "Chat with PDF", "Voice Assistant", "Transcribe Audio", "Transcribe Video"],
-        icons=['chat-dots', 'image', 'file-earmark-pdf', 'mic', 'file-music', 'film'],
+        options=["ChatBot", "Image Captioning", "Embed Text", "Chat with PDF", "Voice Assistant", "Transcribe Audio", "Transcribe Video"],
+        icons=['chat-dots', 'image', 'textarea-t', 'file-earmark-pdf', 'mic', 'file-music', 'film'],
         default_index=0
     )
 
