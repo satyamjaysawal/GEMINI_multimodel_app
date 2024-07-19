@@ -13,4 +13,4 @@ streamlit-option-menu
 langchain_community
 gtts 
 SpeechRecognition 
-playsound==1.2.2
+
