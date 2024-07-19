@@ -22,7 +22,7 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # Function to load the Gemini-Pro model
-def load_gemini_pro_model(model_name="gemini-1.5-flash"):
+def load_gemini_pro_model(model_name="gemini-pro"):
     gemini_pro_model = genai.GenerativeModel(model_name)
     return gemini_pro_model
 
