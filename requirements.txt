@@ -3,7 +3,7 @@ google-generativeai
 python-dotenv
 langchain
 PyPDF2
-PyAudio
+pyaudio
 chromadb
 faiss-cpu
 langchain_google_genai
