@@ -13,7 +13,3 @@ langchain_community
 gtts 
 SpeechRecognition 
 playsound==1.2.2
-sounddevice
-soundfile
-numpy
-
