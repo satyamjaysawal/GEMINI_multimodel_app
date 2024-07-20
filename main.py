@@ -22,12 +22,7 @@ from playsound import playsound
 # Import additional libraries for voice assistance
 import speech_recognition as sr
 from gtts import gTTS
-#import pyaudio
-import sounddevice as sd
-import numpy as np
-#from scipy.io.wavfile import write
-import soundfile as sf
-
+import pyaudio
 
 # Load environment variables from .env file
 load_dotenv()
@@ -149,50 +144,36 @@ elif selected == "Chat with PDF":
                 get_vector_store(text_chunks)
                 st.success("Done")
 
-# Function to record audio using sounddevice
-def record_audio(duration=5, fs=44100):
-    print("Recording...")
-    audio = sd.rec(int(duration * fs), samplerate=fs, channels=1, dtype='int16')
-    sd.wait()
-    print("Recording finished.")
-    return audio, fs
-
 # Voice Assistant section
-if selected == "Voice Assistant":
+elif selected == "Voice Assistant":
     st.title("Gemini AI Voice Assistant")
     st.write("Click the button below and speak to get a response from Gemini.")
 
     if st.button("Speak Now"):
+        r = sr.Recognizer()
+        mic = sr.Microphone()
+        with mic as source:
+            st.write("Listening...")
+            audio = r.listen(source)
         try:
-            duration = 5  # Duration in seconds
-            audio, fs = record_audio(duration)
+            # Recognize the speech using Google's speech recognition
+            text = r.recognize_google(audio)
+            st.write(f"You said: {text}")
 
-            # Save the audio to a temporary WAV file
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio_file:
-                sf.write(temp_audio_file.name, audio, fs)
-                temp_audio_file.seek(0)
-                audio_file_path = temp_audio_file.name
+            # Generate content using the generative model
+            model = load_gemini_pro_model()
+            response = model.generate_content(text)
+            response_text = response.text
+            st.write(f"Gemini response: {response_text}")
 
-            recognizer = sr.Recognizer()
-            with sr.AudioFile(audio_file_path) as source:
-                audio_data = recognizer.record(source)
-                text = recognizer.recognize_google(audio_data)
-                st.write(f"You said: {text}")
+            # Convert the response text to speech
+            tts = gTTS(response_text, lang='en')
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as fp:
+                tts.save(fp.name)
+                audio_file = fp.name
 
-                # Generate content using the generative model
-                model = load_gemini_pro_model()
-                response = model.generate_content(text)
-                response_text = response.text
-                st.write(f"Gemini response: {response_text}")
-
-                # Convert the response text to speech
-                tts = gTTS(response_text, lang='en')
-                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as fp:
-                    tts.save(fp.name)
-                    audio_file = fp.name
-
-                # Play the generated speech audio using Streamlit
-                st.audio(audio_file)
+            # Play the generated speech audio using playsound
+            st.audio(audio_file)
 
         except sr.UnknownValueError:
             st.write("Sorry, I could not understand the audio.")
