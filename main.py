@@ -1,3 +1,8 @@
+# Import necessary libraries at the beginning of the file
+import sounddevice as sd
+import wavio
+
+# Rest of the imports
 import streamlit as st
 from PIL import Image
 from PyPDF2 import PdfReader
@@ -14,16 +19,15 @@ import asyncio
 from streamlit_option_menu import option_menu
 from gemini_utility import load_gemini_pro_model, get_gemini_response, embed_text, get_pdf_text, get_text_chunks, get_vector_store, user_input
 from gemini_utility import upload_audio_file, generate_transcription
-
 from gemini_utility import load_gemini_pro_model, generate_video_transcription
 import tempfile
 from gemini_utility import input_image_setup
 from playsound import playsound
+
 # Import additional libraries for voice assistance
 import speech_recognition as sr
 from gtts import gTTS
-#import pyaudio
-
+import pyaudio
 # Load environment variables from .env file
 load_dotenv()
 
@@ -151,8 +155,8 @@ elif selected == "Voice Assistant":
 
     if st.button("Speak Now"):
         r = sr.Recognizer()
-        mic = sr.Microphone()
-        with mic as source:
+        # Mic input ke liye sounddevice use karte hain
+        with sr.Microphone() as source:
             st.write("Listening...")
             audio = r.listen(source)
         try:
