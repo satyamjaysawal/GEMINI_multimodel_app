@@ -27,7 +27,7 @@ from playsound import playsound
 # Import additional libraries for voice assistance
 import speech_recognition as sr
 from gtts import gTTS
-import pyaudio
+#import pyaudio
 # Load environment variables from .env file
 load_dotenv()
 
