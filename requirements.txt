@@ -15,4 +15,4 @@ SpeechRecognition
 playsound==1.2.2
 sounddevice 
 wavio
-
+PortAudio
