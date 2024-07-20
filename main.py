@@ -1,8 +1,3 @@
-# Import necessary libraries at the beginning of the file
-#import sounddevice as sd
-#import wavio
-
-# Rest of the imports
 import streamlit as st
 from PIL import Image
 from PyPDF2 import PdfReader
@@ -19,15 +14,21 @@ import asyncio
 from streamlit_option_menu import option_menu
 from gemini_utility import load_gemini_pro_model, get_gemini_response, embed_text, get_pdf_text, get_text_chunks, get_vector_store, user_input
 from gemini_utility import upload_audio_file, generate_transcription
+
 from gemini_utility import load_gemini_pro_model, generate_video_transcription
 import tempfile
 from gemini_utility import input_image_setup
 from playsound import playsound
-
 # Import additional libraries for voice assistance
 import speech_recognition as sr
 from gtts import gTTS
-#import pyaudio
+# import pyaudio
+import sounddevice as sd
+import numpy as np
+from scipy.io.wavfile import write
+import soundfile as sf
+
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -148,37 +149,50 @@ elif selected == "Chat with PDF":
                 get_vector_store(text_chunks)
                 st.success("Done")
 
+# Function to record audio using sounddevice
+def record_audio(duration=5, fs=44100):
+    print("Recording...")
+    audio = sd.rec(int(duration * fs), samplerate=fs, channels=1, dtype='int16')
+    sd.wait()
+    print("Recording finished.")
+    return audio, fs
+
 # Voice Assistant section
-# Voice Assistant section
-elif selected == "Voice Assistant":
+if selected == "Voice Assistant":
     st.title("Gemini AI Voice Assistant")
     st.write("Click the button below and speak to get a response from Gemini.")
 
     if st.button("Speak Now"):
-        r = sr.Recognizer()
-        mic = sr.Microphone()
-        with mic as source:
-            st.write("Listening...")
-            audio = r.listen(source)
         try:
-            # Recognize the speech using Google's speech recognition
-            text = r.recognize_google(audio)
-            st.write(f"You said: {text}")
+            duration = 5  # Duration in seconds
+            audio, fs = record_audio(duration)
 
-            # Generate content using the generative model
-            model = load_gemini_pro_model()
-            response = model.generate_content(text)
-            response_text = response.text
-            st.write(f"Gemini response: {response_text}")
+            # Save the audio to a temporary WAV file
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio_file:
+                sf.write(temp_audio_file.name, audio, fs)
+                temp_audio_file.seek(0)
+                audio_file_path = temp_audio_file.name
 
-            # Convert the response text to speech
-            tts = gTTS(response_text, lang='en')
-            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as fp:
-                tts.save(fp.name)
-                audio_file = fp.name
+            recognizer = sr.Recognizer()
+            with sr.AudioFile(audio_file_path) as source:
+                audio_data = recognizer.record(source)
+                text = recognizer.recognize_google(audio_data)
+                st.write(f"You said: {text}")
 
-            # Play the generated speech audio using playsound
-            st.audio(audio_file)
+                # Generate content using the generative model
+                model = load_gemini_pro_model()
+                response = model.generate_content(text)
+                response_text = response.text
+                st.write(f"Gemini response: {response_text}")
+
+                # Convert the response text to speech
+                tts = gTTS(response_text, lang='en')
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as fp:
+                    tts.save(fp.name)
+                    audio_file = fp.name
+
+                # Play the generated speech audio using Streamlit
+                st.audio(audio_file)
 
         except sr.UnknownValueError:
             st.write("Sorry, I could not understand the audio.")
