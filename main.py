@@ -1,6 +1,6 @@
 # Import necessary libraries at the beginning of the file
-import sounddevice as sd
-import wavio
+#import sounddevice as sd
+#import wavio
 
 # Rest of the imports
 import streamlit as st
@@ -149,14 +149,15 @@ elif selected == "Chat with PDF":
                 st.success("Done")
 
 # Voice Assistant section
+# Voice Assistant section
 elif selected == "Voice Assistant":
     st.title("Gemini AI Voice Assistant")
     st.write("Click the button below and speak to get a response from Gemini.")
 
     if st.button("Speak Now"):
         r = sr.Recognizer()
-        # Mic input ke liye sounddevice use karte hain
-        with sr.Microphone() as source:
+        mic = sr.Microphone()
+        with mic as source:
             st.write("Listening...")
             audio = r.listen(source)
         try:
