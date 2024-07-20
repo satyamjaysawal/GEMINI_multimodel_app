@@ -22,7 +22,7 @@ from playsound import playsound
 # Import additional libraries for voice assistance
 import speech_recognition as sr
 from gtts import gTTS
-# import pyaudio
+import pyaudio
 import sounddevice as sd
 import numpy as np
 from scipy.io.wavfile import write
