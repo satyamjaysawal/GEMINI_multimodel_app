@@ -16,5 +16,4 @@ playsound==1.2.2
 sounddevice
 scipy
 soundfile
-pyaudio
 numpy
