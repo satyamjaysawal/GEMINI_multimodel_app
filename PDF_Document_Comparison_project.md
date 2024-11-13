@@ -87,15 +87,6 @@ The application will run on `http://127.0.0.1:5000`.
 - **google-generativeai**: To connect with the Google Generative AI model.
 - **python-dotenv**: To manage environment variables securely.
 
-## Additional Notes
-
-- **Error Handling**: The app includes basic error handling for file uploads and API interactions.
-- **API Limitations**: Ensure your Google API key has adequate quota to handle AI requests.
-
-## Troubleshooting
-
-- If the app does not load, check that the correct Python version is installed and that all dependencies are properly installed.
-- For issues with AI responses, verify that your Google API key is correctly configured and has the necessary permissions.
 
 ---
 
