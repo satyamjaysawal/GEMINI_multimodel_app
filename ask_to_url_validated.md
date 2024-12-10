@@ -127,5 +127,5 @@ And the query is `"Summarize the content of the page."`, the response will be:
 Gemini 1.5 Flash Model's Response:
 The Prime Minister of India is Narendra Modi.
 ```
-
-Let me know if you encounter any issues or need further adjustments!
+****
+****
