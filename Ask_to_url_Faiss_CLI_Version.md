@@ -17,7 +17,7 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Configure Google Generative AI API
-GOOGLE_API_KEY = "AIzaSyCq6fkWlTcWfWYaPAfer1nFhOiQuof1c4M"
+GOOGLE_API_KEY = ""
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # Initialize Gemini model
