@@ -1,4 +1,6 @@
-Here is the complete Python code as you requested:
+
+![image](https://github.com/user-attachments/assets/59c9a700-b03b-49af-85dd-beaa02188683)
+
 
 ```python
 import os
