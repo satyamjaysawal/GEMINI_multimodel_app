@@ -41,22 +41,115 @@ def is_valid_url(url):
         return False
 
 # Function to fetch and extract text from a URL
-def extract_text_from_url(url):
-    """Fetches and extracts text content from a URL."""
-    print(Fore.YELLOW + "Validating URL..." + Style.RESET_ALL)
-    if not is_valid_url(url):
-        print(Fore.RED + "Invalid URL provided. Exiting." + Style.RESET_ALL)
-        raise ValueError("Invalid URL provided.")
+# def extract_text_from_url(url):
+#     """Fetches and extracts text content from a URL."""
+#     print(Fore.YELLOW + "Validating URL..." + Style.RESET_ALL)
+#     if not is_valid_url(url):
+#         print(Fore.RED + "Invalid URL provided. Exiting." + Style.RESET_ALL)
+#         raise ValueError("Invalid URL provided.")
+#     try:
+#         print(Fore.YELLOW + "Fetching content from URL..." + Style.RESET_ALL)
+#         response = requests.get(url, verify=False)  # Disable SSL verification
+#         response.raise_for_status()
+#         soup = BeautifulSoup(response.content, 'html.parser')
+#         print(Fore.GREEN + "Content fetched successfully!" + Style.RESET_ALL)
+#         return "\n".join(soup.stripped_strings)
+#     except requests.exceptions.RequestException as e:
+#         print(Fore.RED + f"Failed to fetch URL content: {e}" + Style.RESET_ALL)
+#         raise RuntimeError(f"Failed to fetch URL content: {e}")
+
+# def extract_text_from_url(url, depth=1, max_depth=3, visited=None):
+#     """Fetches and extracts text content from a URL and follows links recursively up to a specified depth."""
+#     if visited is None:
+#         visited = set()  # Keep track of visited URLs to avoid revisiting
+#     if depth > max_depth:
+#         return ""
+
+#     if url in visited:
+#         print(Fore.BLUE + f"URL already visited: {url}" + Style.RESET_ALL)
+#         return ""
+    
+#     visited.add(url)
+#     print(Fore.YELLOW + f"Depth {depth}: Fetching content from URL: {url}" + Style.RESET_ALL)
+
+#     try:
+#         response = requests.get(url, verify=False, timeout=10)
+#         response.raise_for_status()
+#         soup = BeautifulSoup(response.content, 'html.parser')
+        
+#         # Extract text from the current page
+#         page_text = "\n".join(soup.stripped_strings)
+        
+#         # Recursively fetch links on the page
+#         if depth < max_depth:
+#             print(Fore.YELLOW + f"Depth {depth}: Extracting links from: {url}" + Style.RESET_ALL)
+#             links = {link.get('href') for link in soup.find_all('a', href=True)}
+#             links = {link for link in links if is_valid_url(link)}  # Only process valid URLs
+#             for link in links:
+#                 page_text += "\n" + extract_text_from_url(link, depth + 1, max_depth, visited)
+
+#         print(Fore.GREEN + f"Depth {depth}: Content fetched successfully from: {url}" + Style.RESET_ALL)
+#         return page_text
+
+#     except requests.exceptions.RequestException as e:
+#         print(Fore.RED + f"Failed to fetch URL content: {e}" + Style.RESET_ALL)
+#         return ""
+
+
+import time
+
+def extract_text_from_url(url, depth=1, max_depth=3, visited=None, start_time=None, time_limit=60):
+    """
+    Fetches and extracts text content from a URL and follows links recursively up to a specified depth,
+    with a time constraint.
+    """
+    if visited is None:
+        visited = set()  # Keep track of visited URLs to avoid revisiting
+    if start_time is None:
+        start_time = time.time()
+
+    if depth > max_depth:
+        return ""
+    if time.time() - start_time > time_limit:
+        print(Fore.RED + "Time limit reached. Stopping extraction." + Style.RESET_ALL)
+        return ""
+
+    if url in visited:
+        print(Fore.BLUE + f"URL already visited: {url}" + Style.RESET_ALL)
+        return ""
+    
+    visited.add(url)
+    print(Fore.YELLOW + f"Depth {depth}: Fetching content from URL: {url}" + Style.RESET_ALL)
+
     try:
-        print(Fore.YELLOW + "Fetching content from URL..." + Style.RESET_ALL)
-        response = requests.get(url, verify=False)  # Disable SSL verification
+        response = requests.get(url, verify=False, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
-        print(Fore.GREEN + "Content fetched successfully!" + Style.RESET_ALL)
-        return "\n".join(soup.stripped_strings)
+        
+        # Extract text from the current page
+        page_text = "\n".join(soup.stripped_strings)
+        
+        # Recursively fetch links on the page
+        if depth < max_depth:
+            print(Fore.YELLOW + f"Depth {depth}: Extracting links from: {url}" + Style.RESET_ALL)
+            links = {link.get('href') for link in soup.find_all('a', href=True)}
+            links = {link for link in links if is_valid_url(link)}  # Only process valid URLs
+            for link in links:
+                if time.time() - start_time > time_limit:
+                    print(Fore.RED + "Time limit reached during link extraction. Stopping." + Style.RESET_ALL)
+                    break
+                page_text += "\n" + extract_text_from_url(
+                    link, depth + 1, max_depth, visited, start_time, time_limit
+                )
+
+        print(Fore.GREEN + f"Depth {depth}: Content fetched successfully from: {url}" + Style.RESET_ALL)
+        return page_text
+
     except requests.exceptions.RequestException as e:
         print(Fore.RED + f"Failed to fetch URL content: {e}" + Style.RESET_ALL)
-        raise RuntimeError(f"Failed to fetch URL content: {e}")
+        return ""
+
+
 
 # Function to save text to a file
 def save_text_to_file(text, filename):
